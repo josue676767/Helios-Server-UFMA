@@ -1,0 +1,65 @@
+{% extends TEMPLATE_BASE %}
+
+{% block title %}Contatar eleitores de {{election.name}}{% endblock %}
+{% block content %}
+<script>
+var voter_id = null;
+{% if voter %}
+voter_id = '{{voter.voter_id}}';
+{% endif %}
+</script>
+
+  <h2 class="title">{{election.name}} &mdash; Contatar eleitores <span style="font-size:0.7em;">[<a href="{% url "election@view" election.uuid %}">voltar à eleição</a>]</span></h2>
+
+{% if voter %}  
+  <p>
+    Você está enviando este e-mail para um usuário específico: <b>{{voter.name}} ({{voter.voter_id}})</b>
+  </p>
+{% endif %}
+
+<p>
+<b>Modelos</b>:
+
+{% for template_option in templates %}
+{% if template_option.0 == template %}
+<b>{{template_option.1}}</b>
+{% else %}
+<a href="?template={{template_option.0}}&voter_id={{voter.voter_login_id}}">{{template_option.1}}</a>
+{% endif %}
+&nbsp;&nbsp;&nbsp;
+{% endfor %}
+
+<pre style="margin:10px; border: 1px solid #888; padding:20px">
+Assunto: {{default_subject}}
+
+{{default_body|safe}}
+</pre>
+
+<p>
+Você pode ajustar o assunto e adicionar uma mensagem personalizada usando o formulário abaixo.
+</p>
+
+  <form class="prettyform" action="" method="POST" id="email_form">
+    <input type="hidden" name="csrf_token" value="{{csrf_token}}" />
+    <input type="hidden" name="template" value="{{template}}" />
+    <input type="hidden" name="voter_id" value="{{voter.voter_login_id}}" />
+    <table class="pretty">
+     {{email_form.as_table}}
+     </table>
+  <div>
+  <label for="">&nbsp;</label><input type="submit" value="Enviar" id="send_button" class="button" />
+  </div>
+  </form>
+  
+  <div id="processing">
+  </div>
+  
+  <div id="done" style="display:none;">
+    Concluído, <a href="{% url "election@view" election.uuid %}">voltar à eleição</a>.
+  </div>
+
+  <div id="error" style="display:none;">
+    Erro ao enviar e-mail aos participantes. Verifique as configurações do servidor e certifique-se de que há um servidor SMTP.
+  </div>
+
+{% endblock %}

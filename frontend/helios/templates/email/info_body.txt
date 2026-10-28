@@ -1,0 +1,11 @@
+Prezado(a) {{voter.name}},
+
+{{custom_message|safe}}
+
+--
+Helios
+
+{% if unsubscribe_url %}
+Para deixar de receber todos os e-mails do Helios, clique aqui:
+{{ unsubscribe_url }}
+{% endif %}

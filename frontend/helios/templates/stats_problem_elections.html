@@ -1,0 +1,15 @@
+{% extends TEMPLATE_BASE %}
+{% block title %}Estatísticas{% endblock %}
+
+{% block content %}
+<h1>Eleições com problemas</h1>
+
+Não congeladas há mais de um dia.
+
+{% for election in elections %}
+<p>
+<b><a href="{% url "election@view" election.uuid %}">{{election.name}}</a></b> -- {{election.num_voters}} eleitores
+</p>
+{% endfor %}
+
+{% endblock %}

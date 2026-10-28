@@ -1,0 +1,16 @@
+{% extends TEMPLATE_BASE %}
+
+{% block title %}Calcular apuração &mdash; {{election.name}}{% endblock %}
+{% block content %}
+  <h2 class="title">{{election.name}} &mdash; Calcular apuração <span style="font-size:0.7em;">[<a href="{% url "election@view" election.uuid %}">cancelar</a>]</span></h2>
+
+  <p>
+    Você está prestes a calcular a apuração desta eleição. Somente depois disso você poderá ver os resultados.
+  </p>
+
+  <form method="POST" action="">
+    <input type="hidden" name="csrf_token" value="{{csrf_token}}" />
+    <input type="submit" class="button" value="Calcular a apuração!" />
+  </form>
+
+{% endblock %}

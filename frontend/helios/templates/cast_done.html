@@ -1,0 +1,27 @@
+{% extends TEMPLATE_BASE %}
+{% block title %}Confirmar voto{% endblock %}
+
+{% block content %}
+<h1>{{election.name}} &mdash; Voto registrado com sucesso!</h1>
+
+{% if vote_hash %}
+<p>
+  Seu código de rastreamento da cédula é:<br />
+    <span style="font-size:1.4em; font-weight: bold; word-break: break-word;">  {{vote_hash}}</span>
+</p>
+<p>
+  Este código de rastreamento garante matematicamente que sua cédula seja contada. Você pode conferir todos os códigos de rastreamento na <a href="{% url "election@voters@list-pretty" election.uuid %}">lista de eleitores</a>, onde o seu deverá aparecer em alguns minutos.
+</p>
+{% endif %}
+
+{% if logout %}
+<p><b>Para a sua segurança, encerramos a sua sessão.</b></p>
+<iframe width="0" height="0" border="0" frameborder="0" src="{% url "auth@logout" %}">
+</iframe>
+{% endif %}
+
+<p style="font-size: 1.4em;">
+[ <a href="{% url "election@view" election.uuid %}">voltar às informações da eleição</a> ]
+</p>
+
+{% endblock %}

@@ -1,0 +1,15 @@
+{% extends TEMPLATE_BASE %}
+{% block title %}Estatísticas{% endblock %}
+
+{% block content %}
+<h1>Votos recentes</h1>
+
+Últimas 24 horas
+
+{% for election in elections %}
+<p>
+<b><a href="{% url "election@view" election.uuid %}">{{election.name}}</a></b> -- {{election.last_cast_vote}} {{election.num_recent_cast_votes}} votos registrados recentemente
+</p>
+{% endfor %}
+
+{% endblock %}

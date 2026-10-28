@@ -1,0 +1,50 @@
+{% extends 'server_ui/templates/base.html' %}
+{% block title %}Confirmar voto{% endblock %}
+
+{% block content %}
+<script language="javascript">
+$(document).ready(function() {
+  $('#waiting_div').hide();
+});
+
+function show_waiting() {
+  $('#cast_div').hide();
+  $('#waiting_div').show();
+}
+</script>
+<h1>Confirme seu voto</h1>
+
+{% if error %}
+<p style="color: red;">{{error}}</p>
+{% endif %}
+
+<h3>Sua cédula</h3>
+
+<p style="font-size:1.6em;">
+    <tt>{{vote_fingerprint}}</tt>
+</p>
+
+<div id="cast_div">
+<h3>Vote com suas credenciais</h3>
+
+<form method="post" onsubmit="show_waiting();" action="">
+    <input type="hidden" name="csrf_token" value="{{csrf_token}}" />
+
+<table>
+{{form.as_table}}
+</table><br />
+
+    <input type="submit" value="votar com esta cédula" /><br /><br />
+</form>
+
+<p>
+    Esqueceu sua senha? <a href="{% url "auth@password@forgotten" %}?return_url={% url "election@cast-confirm" %}">Receba-a por e-mail</a>.<br />(não se preocupe, não perderemos seu voto).
+</p>
+</div>
+
+<div id="waiting_div" align="center">
+  Verificando e registrando sua cédula<br />
+  <img src="/static/helios/loading.gif" />
+</div>
+
+{% endblock %}

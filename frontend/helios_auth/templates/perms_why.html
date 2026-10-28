@@ -1,0 +1,21 @@
+{% extends TEMPLATE_BASE %}
+
+{% block content %}
+<h1>Por que precisamos das suas informações</h1>
+
+<p>
+Parece que você não autorizou o acesso às suas informações. Entendemos e
+valorizamos a sua privacidade. Solicitamos essas informações para poder
+entrar em contato com você, informando o seu código de acompanhamento do voto
+e quando a apuração de uma eleição da qual você participou for concluída.
+Prometemos não usar essas informações para nenhuma outra finalidade. Sem
+elas, infelizmente não podemos ajudá-lo a votar.
+</p>
+
+<form method="POST" action="">
+<input type="hidden" name="csrf_token" value="{{csrf_token}}" />
+<input class="button" type="submit" value="OK, entendi, vamos continuar com o login." /><br /><br />
+<a href="http://google.com">não, quero sair daqui</a>.
+</form>
+
+{% endblock %}

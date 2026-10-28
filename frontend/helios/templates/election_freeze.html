@@ -1,0 +1,43 @@
+{% extends TEMPLATE_BASE %}
+
+{% block content %}
+  <h2 class="title">{{election.name}} &mdash; Congelar cédula</h2>
+<p>
+Depois que a eleição é congelada, as perguntas, as opções e os curadores não podem mais ser modificados.<br />
+</p>
+
+<p>
+{% if election.openreg %}
+O cadastro de eleitores da sua eleição está atualmente <b>aberto</b>, o que significa que qualquer pessoa pode votar, mesmo depois que você congelar a cédula.
+{% else %}
+O cadastro de eleitores da sua eleição está atualmente <b>fechado</b>, o que significa que somente os eleitores que você designar poderão votar. Como administrador, você ainda poderá modificar a lista de eleitores ao longo da eleição.
+{% endif %}
+</p>    
+
+{% if helios.VOTERS_EMAIL %}
+<p>
+Você precisa congelar a cédula antes de poder entrar em contato com os eleitores.
+</p>
+{% endif %}
+
+{% if issues_p %}
+<p>
+    Antes de poder congelar a eleição, você precisará:
+    <ul>
+        {% for issue in issues %}
+        <li>{{issue.action}}</li>
+        {% endfor %}
+    </ul>
+    <a href="{% url "election@view" election.uuid %}">voltar à eleição</a>
+</p>
+{% else %}
+<form method="post" action="">
+<input type="hidden" name="csrf_token" value="{{csrf_token}}" />
+    
+<input class="button" type="submit" value="Congelar a cédula" />
+<button class="button" onclick="document.location='{% url "election@view" election.uuid %}'; return false;">NÃO congelar ainda</button>
+</form>
+{% endif %}
+
+<br /><br />
+{% endblock %}

@@ -1,0 +1,184 @@
+{% extends TEMPLATE_BASE %}
+{% load timezone_tags %}
+
+{% block title %}Eleitores e Central de Rastreamento de Cédulas de {{election.name}}{% endblock %}
+{% block content %}
+  <h3 class="title">{{election.name}} &mdash; Eleitores e Central de Rastreamento de Cédulas <span style="font-size:0.7em;">[<a href="{% url "election@view" election.uuid %}">voltar à eleição</a>]</span></h3>
+
+<p>
+<b>Quem pode votar?</b>
+{% if election.openreg %}
+{{election.pretty_eligibility|safe}}
+{% else %}
+<em>Somente os eleitores listados aqui</em>.
+{% endif %}
+</p>
+
+{% if admin_p and not election.frozen_at %}
+{% if election.private_p %}
+<em>Sua eleição está marcada como privada, o que significa que não é possível ampliar o cadastro de eleitores</em>.<br />
+{% else %}
+<form method="post" action="{% url "election@voters@eligibility" election.uuid %}">
+<input type="hidden" name="csrf_token" value="{{csrf_token}}" />
+<input type="radio" name="eligibility" value="openreg" {% if election.openreg and not election.eligibility %}CHECKED{% endif %} /> qualquer pessoa pode votar<br />
+<input type="radio" name="eligibility" value="closedreg" {% if not election.openreg %}CHECKED{% endif %} /> somente os eleitores listados explicitamente abaixo podem votar<br />
+{% if categories %}
+<input type="radio" name="eligibility" value="limitedreg" {% if election.eligibility %}CHECKED{% endif %} /> somente eleitores que sejam membros de 
+<select name="category_id">
+{% for category in categories %}
+<option value="{{category.id}}" {% if eligibility_category_id == category.id %}SELECTED{% endif %}> {{category.name}}</option>
+{% endfor %}
+</select>
+<br />
+{% endif %}
+<input class="button" type="submit" value="atualizar" />
+</form>
+{% endif %}
+{% endif %}
+
+{% if email_voters and election.frozen_at and admin_p %}
+<p>
+{% if can_send_emails %}
+<a class="button" href="{% url "election@voters@email" election.uuid %}">enviar e-mail aos eleitores</a>
+{% else %}
+<button class="button" disabled style="opacity: 0.5; cursor: not-allowed;" title="{{email_disabled_reason}}">enviar e-mail aos eleitores (desativado: {{email_disabled_reason}})</button>
+{% endif %}
+</p>
+{% endif %}
+
+{% if election.num_voters > 20 %}
+<p>
+{% if q %}
+<p><em>buscando por <u>{{q}}</u>.</em> [<a href="?">limpar busca</a>]</p>
+{% else %}
+<form method="get" action="{% url "election@voters@list-pretty" election.uuid %}"><b>buscar</b>: <input type="text" name="q" /> <input type="submit" value="buscar" /></form>
+{% endif %}
+</p>
+{% endif %}
+
+<p>
+<a class="button" href="{% url "election@voters@download-csv" election.uuid %}{% if q %}?q={{q|urlencode}}{% endif %}">Baixar eleitores em CSV</a>
+</p>
+
+{% if admin_p %}
+<!-- Add a Voter: WORK HERE-->
+{% if upload_p and not election.openreg %}
+<p>
+{% if can_modify_voters %}
+<a class="button" href="{% url "election@voters@upload" election_uuid=election.uuid %}">enviar eleitores em lote</a>
+{% else %}
+<button class="button" disabled style="opacity: 0.5; cursor: not-allowed;" title="{{modify_voters_disabled_reason}}">enviar eleitores em lote (desativado: {{modify_voters_disabled_reason}})</button>
+{% endif %}
+</p>
+
+{% if voter_files %}
+Envios em lote anteriores:
+<ul>
+{% for vf in voter_files %}
+<li>
+{% if vf.voter_file %}
+{{vf.voter_file.size}}
+{% else %}
+{{vf.voter_file_content|length}}
+{% endif %}
+ bytes, em {{vf.uploaded_at|utc_time}}:
+{% if vf.processing_finished_at %}
+<em>processamento concluído: {{vf.num_voters}} eleitores carregados</em>
+{% else %}
+
+{% if vf.processing_started_at %}
+<em>em processamento</em>
+{% else %}
+<em>ainda não processado</em>
+{% endif %}
+
+{% endif %}
+</li>
+{% endfor %}
+</ul>
+{% endif %}
+{% endif %}
+
+{% if admin_p and not election.frozen_at and election.num_voters > 0 %}
+<p>
+<form style="display: inline;" method="post" action="{% url "election@voters@clear" election.uuid %}" onsubmit="return confirm('Tem certeza de que deseja remover TODOS os {{election.num_voters}} eleitor(es)? Esta ação não pode ser desfeita.');">
+<input type="hidden" name="csrf_token" value="{{csrf_token}}" />
+<input class="button alert" type="submit" value="remover todos os eleitores" />
+</form>
+</p>
+{% endif %}
+
+{% endif %}
+
+{% if voters %}
+
+<p>
+<b>
+{% if election.num_cast_votes %}
+{{election.num_cast_votes}} voto{% if election.num_cast_votes == 1 %}{% else %}s{% endif %} registrado{% if election.num_cast_votes == 1 %}{% else %}s{% endif %}
+{% else %}
+nenhum voto ainda
+{% endif %}
+</b>
+</p>
+
+{% if voters_page.has_previous %}
+<a href="{% url "election@voters@list-pretty" election.uuid %}?page={{voters_page.previous_page_number}}&limit={{limit}}&q={{q|urlencode}}">{{limit}} anteriores</a> &nbsp;&nbsp;
+{% endif %}
+
+
+Eleitores {{voters_page.start_index}} - {{voters_page.end_index}} (de {{total_voters}})&nbsp;&nbsp;
+
+{% if voters_page.has_next %}
+<a href="{% url "election@voters@list-pretty" election.uuid %}?page={{voters_page.next_page_number}}&limit={{limit}}&q={{q|urlencode}}">próximos {{limit}}</a> &nbsp;&nbsp;
+{% endif %}
+
+<table class="pretty">
+<tr>
+{% if admin_p or not election.use_voter_aliases %}
+{% if admin_p %}
+<th style="width: 80px;">Ações</th>
+<th>Login</th>
+<th>Endereço de e-mail</th>
+{% endif %}
+<th>Nome</th>
+{% endif %}
+
+{% if election.use_voter_aliases %}
+<th>Apelido</th>
+{% endif %}
+<th>Código de rastreamento da cédula</th>
+</tr>
+{% for voter in voters %}
+<tr>
+{% if admin_p or not election.use_voter_aliases %}
+{% if admin_p %}
+<td style="white-space: nowrap;">
+{% if election.frozen_at %}
+{% if can_send_emails %}
+[<a href="{% url "election@voters@email" election.uuid %}?voter_id={{voter.voter_login_id}}">e-mail</a>]
+{% else %}
+[<span style="opacity: 0.5; cursor: not-allowed;" title="{{email_disabled_reason}}">e-mail</span>]
+{% endif %}
+{% endif %}
+{% if can_modify_voters %}[<form class="inline-action" method="post" action="{% url "election@voter@delete" election.uuid voter.uuid %}" onsubmit="return confirm('Tem certeza de que deseja remover {{voter.name}}?');"><input type="hidden" name="csrf_token" value="{{csrf_token}}" /><button type="submit" class="link-button">x</button></form>]{% endif %}
+</td>
+<td>{{voter.voter_login_id}}</td>
+<td>{{voter.voter_email}}</td>
+{% endif %}
+<td><img class="small-logo" src="/static/auth/login-icons/{{voter.voter_type}}.png" alt="{{voter.voter_type}}" /> {{voter.name}}</td>
+{% endif %}
+{% if election.use_voter_aliases %}
+<td>{{voter.alias}}</td>
+{% endif %}
+<td><tt style="font-size: 1.4em;">{% if voter.vote_hash %}{{voter.vote_hash}} <span style="font-size:0.8em;"><!-- no link for now --></span>{% else %}&mdash;{% endif %}</tt></td>
+</tr>
+{% endfor %}
+</table>
+
+{% else %}
+<br /><br />
+<em>nenhum eleitor.</em>
+{% endif %}
+
+{% endblock %}

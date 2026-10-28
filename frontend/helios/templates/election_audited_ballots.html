@@ -1,0 +1,45 @@
+{% extends TEMPLATE_BASE %}
+
+{% block title %}Cédulas auditadas de {{election.name}}{% endblock %}
+
+{% block content %}
+  <h2 class="title">{{election.name}} &mdash; Cédulas auditadas <span style="font-size:0.7em;">[<a href="{% url "election@view" election_uuid=election.uuid %}">voltar à eleição</a>]</span></h2>
+
+<p>
+Ao preparar uma cédula no Helios, você recebe imediatamente um código de rastreamento da cédula. Antes de decidir votar com essa cédula, você pode pedir ao Helios que "abra" a cédula criptografada e verifique se o Helios a criptografou corretamente. Feito isso, você pode publicar a cédula aberta aqui, na lista de cédulas auditadas, para que todos possam verificá-la (sua identidade não é incluída). Depois disso, é preciso criptografar novamente suas escolhas e obter um novo código de rastreamento da cédula. Isso ajuda a reduzir a chance de alguém coagir você a votar de forma diferente da sua escolha verdadeira.
+</p>
+
+<p>
+Estas cédulas <em>não foram registradas</em> e não serão contadas. Estão aqui apenas para fins de auditoria, para conferir por amostragem se o Helios está criptografando corretamente as escolhas dos eleitores.
+</p>
+
+<p>
+  Para verificar uma cédula auditada, copie todo o seu conteúdo e cole-o no <a target="_new" href="/booth/single-ballot-verify.html?election_url={% url "election@home" election.uuid %}">verificador de cédula individual</a>.
+</p>
+
+{% if audited_ballots %}
+<p>
+Cédulas auditadas {{offset_plus_one}} - {{offset_plus_limit}} &nbsp;&nbsp;
+</p>
+
+{% if next_after %}
+<a href="?after={{next_after}}&offset={{offset_plus_limit}}">próximos {{limit}}</a> &nbsp;&nbsp;
+{% endif %}
+
+{% if offset == 0 %}
+{% else %}
+<a href="?">voltar ao início</a> &nbsp;&nbsp;
+{% endif %}
+{% if more_p %}
+<a href="?after={{next_after}}&offset={{next_offset}}">próximos {{limit}}</a>
+{% endif %}
+<table class="pretty">
+{% for b in audited_ballots %}
+<tr><td><tt style="font-size: 1.4em;">{{b.vote_hash}}</tt> [<a target="_blank" href="?vote_hash={{b.vote_hash|urlencode}}">ver</a>]</td></tr>
+{% endfor %}
+</table>
+{% else %}
+<em>ainda não há cédulas auditadas</em>
+{% endif %}
+
+{% endblock %}

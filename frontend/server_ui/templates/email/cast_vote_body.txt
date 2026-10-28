@@ -1,0 +1,17 @@
+Prezado(a) {{voter.name}},
+
+Seu voto na eleição {{election.name}} foi registrado com sucesso.
+
+O código de acompanhamento da sua cédula é:
+{{cast_vote.vote_hash}}
+
+A sua cédula criptografada completa está arquivada em:
+{{cast_vote_url}}
+
+{% if election.use_voter_aliases %}
+Esta eleição utiliza apelidos de eleitor para proteger a sua privacidade.
+Seu apelido de eleitor é: {{voter.alias}}.
+{% endif %}
+
+--
+Helios

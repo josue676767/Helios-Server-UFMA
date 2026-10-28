@@ -1,0 +1,105 @@
+{% extends TEMPLATE_BASE %}
+{% block title %}Confirmar voto{% endblock %}
+
+{% block content %}
+<script language="javascript">
+$(document).ready(function() {
+  $('#waiting_div').hide();
+});
+
+function show_waiting() {
+  $('#all_forms').hide();
+  $('#waiting_div').show();
+}
+
+// FIXME: set this to false once it's clear how to set it back to true
+// so that it's not easy to forget to cast a ballot
+var ready_to_unload = true;
+
+window.onbeforeunload = function(evt) {
+  if (ready_to_unload)
+    return;
+
+  if (typeof evt == 'undefined') {
+    evt = window.event;
+  }
+  
+  var message = "Você ainda não registrou sua cédula! Conclua o processo de votação se quiser que seu voto seja contado.";
+
+  if (evt) {
+    evt.returnValue = message;
+  }
+  
+  return message;
+};
+
+</script>
+<h1>Não saia ainda!<br />Autentique-se abaixo para confirmar o voto.</h1>
+
+<div id="waiting_div">
+    Verificando e registrando sua cédula<br />
+    <img src="/static/helios/loading.gif" />
+</div>
+
+<div style="word-wrap: break-word; width: 90vw;">
+Seu código de rastreamento da cédula é:<br>
+<b>{{vote_fingerprint}}</b>
+<br><br>
+</div>
+
+<div id="all_forms">
+
+{% if voter %}
+
+{% include "_castconfirm_docast.html" %}
+
+{% else %}
+
+{% if show_password %}
+{% with cast_ballot="1" %}
+{% include "_castconfirm_password.html" %}
+{% endwith %}
+
+{% else %}
+
+{% if user %}
+<h1>Desculpe!<h1>
+<b>Desculpe, você <em>
+  {% if election.openreg %}
+    <u>não está habilitado</u></em> nesta eleição.
+  {% else %}
+    não está cadastrado</em> nesta eleição, e o cadastro está encerrado.
+  {% endif %}
+  </b><br /></p>
+<p>
+    [<a href="{% url "election@view" election.uuid %}">voltar à página principal da eleição</a>]
+</p>
+{% else %}
+<p>
+{% if election.openreg %}
+
+  {% if election.eligibility %}
+  {% else %}
+   Esta eleição é aberta a <em>qualquer pessoa</em>; entre com a conta de sua preferência.
+  {% endif %}
+
+{% else %}
+  Esta eleição é aberta apenas a <em>eleitores cadastrados</em>; entre com
+  a mesma conta usada no cadastro.
+{% endif %}
+</p>
+
+{{login_box|safe}}
+
+<br />
+Não se preocupe, guardaremos sua cédula enquanto você entra.
+{% endif %}
+
+{% endif %}
+</p>
+{# this closes the IF ELSE of this being password_only #}
+{% endif %}
+
+</div>
+
+{% endblock %}

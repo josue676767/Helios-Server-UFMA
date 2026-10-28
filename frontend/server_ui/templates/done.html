@@ -1,0 +1,17 @@
+{% extends 'server_ui/templates/base.html' %}
+{% block title %}Confirmar voto{% endblock %}
+
+{% block content %}
+<h1>Seu voto foi registrado</h1>
+
+<p>
+    Um voto foi registrado com sucesso para <b>{{voter.voter_id}}</b>, com a impressão digital do voto:
+    <br /><br />
+    <tt style="font-size: 2em;">{{voter.vote_hash}}</tt>
+</p>
+
+<p>
+    Visite a <a href="{% url "election@view" election.uuid %}">página inicial da eleição</a>.
+</p>
+
+{% endblock %}

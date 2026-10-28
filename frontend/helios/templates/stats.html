@@ -1,0 +1,17 @@
+{% extends TEMPLATE_BASE %}
+{% block title %}Estatísticas{% endblock %}
+
+{% block content %}
+<h1>Administração</h1>
+
+<ul>
+<li> <a href="{% url "stats@elections" %}">eleições</a></li>
+<li> <a href="{% url "stats@deleted-elections" %}">eleições excluídas</a></li>
+<li> <a href="{% url "stats@user-search" %}">busca de usuários</a></li>
+<li> <a href="{% url "stats@recent-votes" %}">votos recentes</a></li>
+<li> <a href="{% url "stats@elections-problems" %}">eleições recentes com problemas</a></li>
+</ul>
+
+<div><b>{{num_votes_in_queue}}</b> votos na fila. {% if num_votes_in_queue %}[<form class="inline-action" method="post" action="{% url "stats@force-queue" %}"><input type="hidden" name="csrf_token" value="{{csrf_token}}" /><button type="submit" class="link-button">forçar processamento</button></form>]{% endif %}</div>
+
+{% endblock %}

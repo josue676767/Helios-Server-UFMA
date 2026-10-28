@@ -1,0 +1,14 @@
+{% extends TEMPLATE_BASE %}
+
+{% block title %}Cookies são necessários para usar o Helios{% endblock %}
+
+{% block content %}
+  <h2 class="title">Cookies são necessários para o Helios</h2>
+
+<p>
+Parece que seu navegador não oferece suporte a cookies ou está configurado para bloquear cookies deste site. O Helios precisa definir um cookie de sessão para guardar seu voto, permitir que você entre etc. Ative os cookies e então <a href="{{retest_url}}">prossiga para a preparação da sua cédula</a>
+</p>
+<p>
+Se você continuar sendo redirecionado a esta página, provavelmente os cookies não foram ativados corretamente.
+</p>
+{% endblock %}

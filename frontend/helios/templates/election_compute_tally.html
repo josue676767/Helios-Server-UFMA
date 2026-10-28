@@ -1,0 +1,45 @@
+{% extends TEMPLATE_BASE %}
+
+{% block title %}Calcular apuração criptografada de {{election.name}}{% endblock %}
+
+{% block content %}
+  <h2 class="title">Calcular apuração da eleição: {{election.name}}</h2>
+
+<div id="instructions">
+{% if num_pending_votes > 0 %}
+<p>
+    <b>{{ num_pending_votes }} voto(s) ainda em processamento.</b>
+</p>
+<p>
+    Todos os votos precisam ser verificados antes do cálculo da apuração. Aguarde e tente novamente em instantes.
+    Se o problema persistir, entre em contato com <a href="mailto:{{settings.HELP_EMAIL_ADDRESS}}">{{settings.HELP_EMAIL_ADDRESS}}</a>.
+</p>
+<p>
+    <a href="{% url "election@compute-tally" election.uuid %}">Atualizar esta página</a> |
+    <a href="{% url "election@view" election.uuid %}">voltar à eleição</a>
+</p>
+{% elif election.num_cast_votes %}
+<p>
+    Você está prestes a calcular a apuração criptografada da eleição <b>{{election.name}}</b>.
+</p>
+
+<p>
+    Depois disso, os eleitores não poderão mais votar.
+</p>
+
+<form method="post" action="" onsubmit="alert('Ok, a apuração foi iniciada')" class="pretty">
+<input type="hidden" name="csrf_token" value="{{csrf_token}}" />
+
+<input class="button" type="submit" value="Calcular apuração criptografada!" />
+<button class="button" onclick="document.location='{% url "election@view" election.uuid %}'; return false;">cancelar</button>
+</form>
+{% else %}
+<p>
+Nenhum voto foi registrado nesta eleição. É necessário que ao menos um voto seja registrado antes de calcular a apuração.<br /><br />
+<a href="{% url "election@view" election.uuid %}">voltar à eleição</a>
+</p>
+{% endif %}
+</div>
+
+<br /><br />
+{% endblock %}

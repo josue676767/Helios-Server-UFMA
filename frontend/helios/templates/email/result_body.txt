@@ -1,0 +1,24 @@
+Prezado(a) {{voter.name}},
+
+A apuração da eleição {{election.name}} foi concluída e divulgada:
+
+  {{election_url}}
+
+{{custom_message|safe}}
+
+{% if voter.vote_hash %}O código de acompanhamento da sua cédula nesta eleição era:
+
+  {{voter.vote_hash}}
+
+Se você acredita que este código está incorreto, entre em contato conosco.
+{% else %}
+Parece que você não registrou voto nesta eleição.
+Entre em contato conosco se você acredita que registrou.
+{% endif %}
+--
+Helios
+
+{% if unsubscribe_url %}
+Para deixar de receber todos os e-mails do Helios, clique aqui:
+{{ unsubscribe_url }}
+{% endif %}

@@ -1,0 +1,32 @@
+{% extends "helios/templates/cryptobase.html" %}
+
+{% block content %}
+  <h2 class="title">{{election.name}} &mdash; Página inicial do curador {{trustee.name}}</span></h2>
+
+<p>
+{% if trustee.public_key_hash %}
+Você enviou sua chave pública com sucesso.<br />
+A impressão digital da sua chave pública é: <b>{{trustee.public_key_hash}}</b>.<br />
+Você pode <a href="{% url "election@trustee@check-sk" election.uuid trustee.uuid %}">verificar se possui a chave secreta correta</a>.
+{% else %}
+<a href="{% url "election@trustee@key-generator" election.uuid trustee.uuid %}">configurar sua chave</a>
+{% endif %}
+</p>
+
+<p>
+{% if election.encrypted_tally %}
+{% if trustee.decryption_factors %}
+Você enviou sua descriptografia com sucesso.
+{% else %}
+    A apuração criptografada desta eleição está pronta.<br />
+    <a href="{% url "election@trustee@decrypt-and-prove" election.uuid trustee.uuid %}">descriptografar com sua chave</a>
+{% endif %}
+{% else %}
+Quando a apuração for calculada, volte aqui para fornecer sua chave secreta para a descriptografia.<br />
+Guarde o e-mail com o link da sua página de curador, que contém as credenciais necessárias para voltar aqui.
+{% endif %}
+</p>
+
+
+
+{% endblock %}
